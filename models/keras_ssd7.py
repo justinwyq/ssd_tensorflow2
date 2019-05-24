@@ -23,9 +23,9 @@ from tensorflow.keras.layers import Input, Lambda, Conv2D, MaxPooling2D, BatchNo
 from tensorflow.keras.regularizers import l2
 #import keras.backend as K
 
-# from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
-# from keras_layers.keras_layer_DecodeDetections import DecodeDetections
-# from keras_layers.keras_layer_DecodeDetectionsFast import DecodeDetectionsFast
+from keras_layers.keras_layer_AnchorBoxes import AnchorBoxes
+from keras_layers.keras_layer_DecodeDetections import DecodeDetections
+from keras_layers.keras_layer_DecodeDetectionsFast import DecodeDetectionsFast
 
 def build_model(image_size,
                 n_classes,
@@ -331,20 +331,20 @@ def build_model(image_size,
     boxes7 = Conv2D(n_boxes[3] * 4, (3, 3), strides=(1, 1), padding="same", kernel_initializer='he_normal', kernel_regularizer=l2(l2_reg), name='boxes7')(conv7)
 
 # TODO: Make AnchorBoxes work with TF 2.0
-#     # Generate the anchor boxes
-#     # Output shape of `anchors`: `(batch, height, width, n_boxes, 8)`
-#     anchors4 = AnchorBoxes(img_height, img_width, this_scale=scales[0], next_scale=scales[1], aspect_ratios=aspect_ratios[0],
-#                            two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[0], this_offsets=offsets[0],
-#                            clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors4')(boxes4)
-#     anchors5 = AnchorBoxes(img_height, img_width, this_scale=scales[1], next_scale=scales[2], aspect_ratios=aspect_ratios[1],
-#                            two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[1], this_offsets=offsets[1],
-#                            clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors5')(boxes5)
-#     anchors6 = AnchorBoxes(img_height, img_width, this_scale=scales[2], next_scale=scales[3], aspect_ratios=aspect_ratios[2],
-#                            two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[2], this_offsets=offsets[2],
-#                            clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors6')(boxes6)
-#     anchors7 = AnchorBoxes(img_height, img_width, this_scale=scales[3], next_scale=scales[4], aspect_ratios=aspect_ratios[3],
-#                            two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[3], this_offsets=offsets[3],
-#                            clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors7')(boxes7)
+    # Generate the anchor boxes
+    # Output shape of `anchors`: `(batch, height, width, n_boxes, 8)`
+    anchors4 = AnchorBoxes(img_height, img_width, this_scale=scales[0], next_scale=scales[1], aspect_ratios=aspect_ratios[0],
+                           two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[0], this_offsets=offsets[0],
+                           clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors4')(boxes4)
+    anchors5 = AnchorBoxes(img_height, img_width, this_scale=scales[1], next_scale=scales[2], aspect_ratios=aspect_ratios[1],
+                           two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[1], this_offsets=offsets[1],
+                           clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors5')(boxes5)
+    anchors6 = AnchorBoxes(img_height, img_width, this_scale=scales[2], next_scale=scales[3], aspect_ratios=aspect_ratios[2],
+                           two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[2], this_offsets=offsets[2],
+                           clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors6')(boxes6)
+    anchors7 = AnchorBoxes(img_height, img_width, this_scale=scales[3], next_scale=scales[4], aspect_ratios=aspect_ratios[3],
+                           two_boxes_for_ar1=two_boxes_for_ar1, this_steps=steps[3], this_offsets=offsets[3],
+                           clip_boxes=clip_boxes, variances=variances, coords=coords, normalize_coords=normalize_coords, name='anchors7')(boxes7)
 
     # Reshape the class predictions, yielding 3D tensors of shape `(batch, height * width * n_boxes, n_classes)`
     # We want the classes isolated in the last axis to perform softmax on them
@@ -358,11 +358,11 @@ def build_model(image_size,
     boxes5_reshaped = Reshape((-1, 4), name='boxes5_reshape')(boxes5)
     boxes6_reshaped = Reshape((-1, 4), name='boxes6_reshape')(boxes6)
     boxes7_reshaped = Reshape((-1, 4), name='boxes7_reshape')(boxes7)
-#     # Reshape the anchor box tensors, yielding 3D tensors of shape `(batch, height * width * n_boxes, 8)`
-#     anchors4_reshaped = Reshape((-1, 8), name='anchors4_reshape')(anchors4)
-#     anchors5_reshaped = Reshape((-1, 8), name='anchors5_reshape')(anchors5)
-#     anchors6_reshaped = Reshape((-1, 8), name='anchors6_reshape')(anchors6)
-#     anchors7_reshaped = Reshape((-1, 8), name='anchors7_reshape')(anchors7)
+    # Reshape the anchor box tensors, yielding 3D tensors of shape `(batch, height * width * n_boxes, 8)`
+    anchors4_reshaped = Reshape((-1, 8), name='anchors4_reshape')(anchors4)
+    anchors5_reshaped = Reshape((-1, 8), name='anchors5_reshape')(anchors5)
+    anchors6_reshaped = Reshape((-1, 8), name='anchors6_reshape')(anchors6)
+    anchors7_reshaped = Reshape((-1, 8), name='anchors7_reshape')(anchors7)
 
     # Concatenate the predictions from the different layers and the assosciated anchor box tensors
     # Axis 0 (batch) and axis 2 (n_classes or 4, respectively) are identical for all layer predictions,
@@ -379,11 +379,11 @@ def build_model(image_size,
                                                              boxes6_reshaped,
                                                              boxes7_reshaped])
 
-#     # Output shape of `anchors_concat`: (batch, n_boxes_total, 8)
-#     anchors_concat = Concatenate(axis=1, name='anchors_concat')([anchors4_reshaped,
-#                                                                  anchors5_reshaped,
-#                                                                  anchors6_reshaped,
-#                                                                  anchors7_reshaped])
+    # Output shape of `anchors_concat`: (batch, n_boxes_total, 8)
+    anchors_concat = Concatenate(axis=1, name='anchors_concat')([anchors4_reshaped,
+                                                                 anchors5_reshaped,
+                                                                 anchors6_reshaped,
+                                                                 anchors7_reshaped])
 
     # The box coordinate predictions will go into the loss function just the way they are,
     # but for the class predictions, we'll apply a softmax activation layer first
@@ -391,8 +391,7 @@ def build_model(image_size,
 
     # Concatenate the class and box coordinate predictions and the anchors to one large predictions tensor
     # Output shape of `predictions`: (batch, n_boxes_total, n_classes + 4 + 8)
-#     predictions = Concatenate(axis=2, name='predictions')([classes_softmax, boxes_concat, anchors_concat])
-    predictions = Concatenate(axis=2, name='predictions')([classes_softmax, boxes_concat])
+    predictions = Concatenate(axis=2, name='predictions')([classes_softmax, boxes_concat, anchors_concat])
 
     if mode == 'training':
         model = Model(inputs=x, outputs=predictions)
